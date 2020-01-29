@@ -1,0 +1,10 @@
+
+[Desktop Entry]
+Name=qvge
+GenericName=Visual Graph Editor
+Exec=qvgeapp
+Icon=${SNAP}/qvge.png
+Type=Application
+StartupNotify=false
+Terminal=false
+Categories=Utility;

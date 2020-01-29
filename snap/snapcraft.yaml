@@ -1,0 +1,114 @@
+name: qvge
+summary: Qt Visual Graph Editor
+description: |
+     qvge is a multiplatform graph editor written in C++/Qt. Its main goal is to make it
+     possible to visually edit two-dimensional graphs in a simple and intuitive way.
+     - Easy creation and parameterising of small-sized till middle-sized graph
+     - Hierarchical attribute model for nodes and edges
+     - Dynamically maintained list of commutations between nodes
+     - Directed, undirected and mixed graphs supported
+     - Node ports supported as well
+     - Search among the graph elements and their attributes
+     - Auto-creation and auto-layout of graphs (via OGDF)
+     - Native graph persistence format (XGR)
+     - Reading GraphML, GML, GraphViz DOT (partially) and GEXF files
+     - Export into PDF and popular image formats
+     - Export into GraphViz DOT format
+     - Export into GEXF format 
+icon: gui/qvge.png
+confinement: strict
+adopt-info: qvge
+base: core18
+grade: stable
+
+apps:
+  qvge:
+    adapter: full
+    command: bin/qvgeapp
+    command-chain:
+      - bin/desktop-launch
+      - bin/gtk3-env-launch
+    desktop: qvge.desktop
+    environment:
+      DISABLE_WAYLAND: 1 
+    plugs:
+      - home
+      - opengl
+      - removable-media
+      - unity7
+      - x11
+      - wayland
+      - gsettings # allow wayland apps access system theme settings
+      - desktop
+      - desktop-legacy
+parts:
+  launchers: # custom launcher to set QT_QPA_PLATFORMTHEME=gtk3 correctly
+    source: local/launchers
+    plugin: dump
+    organize:
+      '*': bin/
+  desktop-file:
+    source: gui
+    source-type: local
+    plugin: dump
+
+  qvge:
+    plugin: qmake
+    after: [desktop-qt5]
+    source-type: git
+    source: https://github.com/ArsMasiuk/qvge.git 
+    override-pull: |
+        snapcraftctl pull
+        snapcraftctl set-version \
+        "$(git describe --tag --abbrev=0 | sed 's/v//')"
+#        "$(git describe --long --tags --always --match=v*.*.* | sed 's/v//')"
+    build-packages:
+      - libqt5svg5-dev
+      - qttools5-dev-tools
+      - libqt5x11extras5-dev
+      - libpoppler-qt5-dev
+      - qt5-default
+      - pkg-config
+    override-build: | # enable snap deployment target and set app store
+        cd src
+        qmake -r
+        make
+        mkdir -p $SNAPCRAFT_PART_INSTALL/bin
+        cp bin/qvgeapp $SNAPCRAFT_PART_INSTALL/bin
+    stage-packages:
+      - qttranslations5-l10n
+      - libqt5core5a
+      - libqt5gui5
+      - libqt5network5
+      - libqt5sql5-sqlite
+      - libqt5svg5
+      - libqt5printsupport5
+      - libqt5x11extras5
+      - libqt5xml5
+      - qtwayland5
+      - zlib1g
+      - dbus
+      - qt5-gtk-platformtheme # for theming, font settings, cursor and to use gtk3 file chooser
+      - qt5-style-plugins # for mouse cursor theme fix
+  desktop-qt5: # custom define becasue no remote parts are supported when using a base (at least not on 16.04), https://github.com/ubuntu/snapcraft-desktop-helpers
+    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
+    source-subdir: qt
+    plugin: make
+    make-parameters: ["FLAVOR=qt5"]
+    build-packages:
+      - qtbase5-dev
+      - dpkg-dev
+    stage-packages:
+      - libxkbcommon0
+      - ttf-ubuntu-font-family
+      - dmz-cursor-theme
+      - adwaita-icon-theme
+      - light-themes
+      - gnome-themes-standard
+      - shared-mime-info
+      - libqt5gui5
+      - libgdk-pixbuf2.0-0
+      - libqt5svg5 # for loading icon themes which are svg
+      - try: [appmenu-qt5] # not available on core18
+      - locales-all
+      - xdg-user-dirs
