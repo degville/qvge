@@ -68,7 +68,6 @@ parts:
       - libqt5svg5-dev
       - qttools5-dev-tools
       - libqt5x11extras5-dev
-      - libqt5opengl5-dev
       - libpoppler-qt5-dev
       - libqt5opengl5-dev
       - qt5-default
