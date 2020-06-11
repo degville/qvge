@@ -63,11 +63,14 @@ parts:
         "$(git describe --tag --abbrev=0 | sed 's/v//')"
 #        "$(git describe --long --tags --always --match=v*.*.* | sed 's/v//')"
     build-packages:
+      - build-essential
+      - g++
       - libqt5svg5-dev
       - qttools5-dev-tools
       - libqt5x11extras5-dev
       - libqt5opengl5-dev
       - libpoppler-qt5-dev
+      - libqt5opengl5-dev
       - qt5-default
       - pkg-config
     override-build: | # enable snap deployment target and set app store
@@ -113,3 +116,4 @@ parts:
       - try: [appmenu-qt5] # not available on core18
       - locales-all
       - xdg-user-dirs
+      - libgtk2.0-0
